@@ -1,17 +1,38 @@
 import { useState } from 'react'
 
-const navigation = [
+const studentNav = [
   { id: 'inicio', label: 'Início', icon: '🏠' },
   { id: 'ranking', label: 'Ranking', icon: '🏆' },
   { id: 'perfil', label: 'Perfil', icon: '👤' },
 ]
 
+const professorNav = [
+  { id: 'prof-dashboard', label: 'Dashboard', icon: '📊' },
+  { id: 'prof-perguntas', label: 'Perguntas', icon: '❓' },
+  { id: 'prof-campeonato', label: 'Campeonatos', icon: '🎯' },
+  { id: 'prof-historico', label: 'Histórico', icon: '📜' },
+]
+
 export default function App() {
   const [page, setPage] = useState('inicio')
+  const [userRole, setUserRole] = useState('student') // 'student' ou 'professor'
 
   const userData = {
     name: 'João Silva',
     course: 'Engenharia Mecânica',
+  }
+
+  const professorData = {
+    name: 'Prof. Carlos Eduardo',
+    department: 'Engenharia Mecânica',
+  }
+
+  const navigation = userRole === 'student' ? studentNav : professorNav
+  const currentUser = userRole === 'student' ? userData : professorData
+
+  const handleRoleSwitch = () => {
+    setUserRole(userRole === 'student' ? 'professor' : 'student')
+    setPage(userRole === 'student' ? 'prof-dashboard' : 'inicio')
   }
 
   return (
@@ -21,8 +42,26 @@ export default function App() {
           <span className="brand-mark">⚙️</span>
           <div className="brand-text">
             <strong>TorqueQuiz</strong>
-            <small>Campeonato de Conhecimento</small>
+            <small>{userRole === 'student' ? 'Campeonato de Conhecimento' : 'Painel do Professor'}</small>
           </div>
+        </div>
+
+        {/* ROLE SWITCHER */}
+        <div className="role-switcher">
+          <button 
+            className={`role-btn ${userRole === 'student' ? 'active' : ''}`}
+            onClick={handleRoleSwitch}
+            title="Alternar para Aluno"
+          >
+            👤
+          </button>
+          <button 
+            className={`role-btn ${userRole === 'professor' ? 'active' : ''}`}
+            onClick={handleRoleSwitch}
+            title="Alternar para Professor"
+          >
+            🎓
+          </button>
         </div>
 
         <nav className="sidebar-nav">
@@ -39,20 +78,27 @@ export default function App() {
         </nav>
 
         <div className="sidebar-footer">
-          <button className="profile-pill" onClick={() => setPage('perfil')}>
-            <span className="avatar">{userData.name.charAt(0)}</span>
+          <button className="profile-pill" onClick={() => setPage(userRole === 'student' ? 'perfil' : 'prof-dashboard')}>
+            <span className="avatar">{currentUser.name.charAt(0)}</span>
             <div className="profile-info">
-              <strong>{userData.name}</strong>
-              <small>{userData.course}</small>
+              <strong>{currentUser.name}</strong>
+              <small>{userRole === 'student' ? currentUser.course : currentUser.department}</small>
             </div>
           </button>
         </div>
       </aside>
 
       <main className="content">
-        {page === 'inicio' && <HomePage />}
-        {page === 'ranking' && <RankingPage />}
-        {page === 'perfil' && <ProfilePage />}
+        {/* STUDENT PAGES */}
+        {userRole === 'student' && page === 'inicio' && <HomePage />}
+        {userRole === 'student' && page === 'ranking' && <RankingPage />}
+        {userRole === 'student' && page === 'perfil' && <ProfilePage />}
+
+        {/* PROFESSOR PAGES */}
+        {userRole === 'professor' && page === 'prof-dashboard' && <ProfessorDashboard setPage={setPage} />}
+        {userRole === 'professor' && page === 'prof-perguntas' && <QuestionBank setPage={setPage} />}
+        {userRole === 'professor' && page === 'prof-campeonato' && <CreateCampaign setPage={setPage} />}
+        {userRole === 'professor' && page === 'prof-historico' && <CampaignHistory />}
       </main>
     </div>
   )
@@ -691,6 +737,449 @@ function ProfilePage() {
           <div className="comparison-insight above">
             <span>✨ Você está acima da média em ambas as métricas!</span>
           </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+/* ================================================================ */
+/* PROFESSOR AREA - PAINEL DO PROFESSOR */
+/* ================================================================ */
+
+function ProfessorDashboard({ setPage }) {
+  const dashboardStats = [
+    { icon: '🎯', value: '3', label: 'Campeonatos Ativos', color: '#3b82f6' },
+    { icon: '❓', value: '48', label: 'Perguntas Cadastradas', color: '#8b5cf6' },
+    { icon: '👥', value: '145', label: 'Alunos Participantes', color: '#10b981' },
+    { icon: '⚡', value: '8', label: 'Rodadas em Andamento', color: '#f59e0b' },
+  ]
+
+  const activeCampaigns = [
+    { id: 1, name: 'Campeonato de Mecânica', status: 'ativo', rounds: 8, participants: 45, startDate: '01/05/2026' },
+    { id: 2, name: 'Desafio Dinâmica', status: 'ativo', rounds: 6, participants: 38, startDate: '10/05/2026' },
+    { id: 3, name: 'Battle Termodinâmica', status: 'pausa', rounds: 4, participants: 52, startDate: '15/05/2026' },
+  ]
+
+  return (
+    <div className="professor-container">
+      <section className="professor-header">
+        <h1>📊 Painel do Professor</h1>
+        <p>Gerencie campeonatos, crie perguntas e acompanhe o desempenho dos alunos</p>
+      </section>
+
+      <div className="prof-stats-grid">
+        {dashboardStats.map((stat, idx) => (
+          <div key={idx} className="prof-stat-card">
+            <div className="prof-stat-icon">{stat.icon}</div>
+            <div className="prof-stat-content">
+              <div className="prof-stat-value">{stat.value}</div>
+              <div className="prof-stat-label">{stat.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="prof-action-buttons">
+        <button className="btn-primary-lg" onClick={() => setPage('prof-campeonato')}>
+          🎯 Criar Campeonato
+        </button>
+        <button className="btn-secondary-lg" onClick={() => setPage('prof-perguntas')}>
+          ❓ Criar Perguntas
+        </button>
+      </div>
+
+      <section className="prof-section">
+        <div className="prof-section-header">
+          <h2>🎯 Campeonatos Ativos</h2>
+          <button className="btn-secondary" onClick={() => setPage('prof-historico')}>Ver Histórico</button>
+        </div>
+        <div className="prof-campaigns-grid">
+          {activeCampaigns.map((campaign) => (
+            <div key={campaign.id} className={`prof-campaign-card ${campaign.status}`}>
+              <div className="campaign-badge">{campaign.status === 'ativo' ? '🟢 Ativo' : '⏸️ Pausa'}</div>
+              <h3 className="campaign-name">{campaign.name}</h3>
+              <div className="campaign-details">
+                <div className="detail-item">
+                  <span className="detail-label">Rodadas</span>
+                  <span className="detail-value">{campaign.rounds}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Participantes</span>
+                  <span className="detail-value">{campaign.participants}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Início</span>
+                  <span className="detail-value">{campaign.startDate}</span>
+                </div>
+              </div>
+              <button className="campaign-action">Gerenciar →</button>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function QuestionBank({ setPage }) {
+  const [questions, setQuestions] = useState([
+    { id: 1, question: 'O que é torque?', theme: 'Mecânica', difficulty: 'Médio', semester: '5º', uses: 12 },
+    { id: 2, question: 'Defina momento angular', theme: 'Dinâmica', difficulty: 'Difícil', semester: '5º', uses: 8 },
+    { id: 3, question: 'Qual é a primeira lei de Newton?', theme: 'Dinâmica', difficulty: 'Fácil', semester: '4º', uses: 25 },
+  ])
+
+  const [formData, setFormData] = useState({
+    question: '',
+    optionA: '',
+    optionB: '',
+    optionC: '',
+    optionD: '',
+    correct: 'A',
+    theme: 'Mecânica',
+    difficulty: 'Médio',
+    semester: '5º',
+  })
+
+  const handleAddQuestion = () => {
+    if (formData.question.trim()) {
+      setQuestions([...questions, {
+        id: questions.length + 1,
+        question: formData.question,
+        theme: formData.theme,
+        difficulty: formData.difficulty,
+        semester: formData.semester,
+        uses: 0,
+      }])
+      setFormData({
+        question: '', optionA: '', optionB: '', optionC: '', optionD: '',
+        correct: 'A', theme: 'Mecânica', difficulty: 'Médio', semester: '5º',
+      })
+    }
+  }
+
+  return (
+    <div className="professor-container">
+      <section className="professor-header">
+        <h1>❓ Banco de Perguntas</h1>
+        <p>Crie e gerencie as perguntas para seus campeonatos</p>
+      </section>
+
+      <section className="prof-section">
+        <h2>Criar Nova Pergunta</h2>
+        <div className="prof-form">
+          <div className="form-group-full">
+            <label>Pergunta *</label>
+            <textarea
+              placeholder="Digite a pergunta..."
+              value={formData.question}
+              onChange={(e) => setFormData({ ...formData, question: e.target.value })}
+              rows="3"
+            />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Alternativa A</label>
+              <input
+                type="text"
+                placeholder="Opção A"
+                value={formData.optionA}
+                onChange={(e) => setFormData({ ...formData, optionA: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Alternativa B</label>
+              <input
+                type="text"
+                placeholder="Opção B"
+                value={formData.optionB}
+                onChange={(e) => setFormData({ ...formData, optionB: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Alternativa C</label>
+              <input
+                type="text"
+                placeholder="Opção C"
+                value={formData.optionC}
+                onChange={(e) => setFormData({ ...formData, optionC: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Alternativa D</label>
+              <input
+                type="text"
+                placeholder="Opção D"
+                value={formData.optionD}
+                onChange={(e) => setFormData({ ...formData, optionD: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Resposta Correta *</label>
+              <select value={formData.correct} onChange={(e) => setFormData({ ...formData, correct: e.target.value })}>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Tema *</label>
+              <select value={formData.theme} onChange={(e) => setFormData({ ...formData, theme: e.target.value })}>
+                <option value="Mecânica">Mecânica</option>
+                <option value="Dinâmica">Dinâmica</option>
+                <option value="Termodinâmica">Termodinâmica</option>
+                <option value="Eletromagnetismo">Eletromagnetismo</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Dificuldade *</label>
+              <select value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}>
+                <option value="Fácil">Fácil</option>
+                <option value="Médio">Médio</option>
+                <option value="Difícil">Difícil</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Semestre *</label>
+              <select value={formData.semester} onChange={(e) => setFormData({ ...formData, semester: e.target.value })}>
+                <option value="4º">4º Semestre</option>
+                <option value="5º">5º Semestre</option>
+                <option value="6º">6º Semestre</option>
+              </select>
+            </div>
+          </div>
+
+          <button className="btn-primary" onClick={handleAddQuestion}>
+            ✓ Salvar Pergunta
+          </button>
+        </div>
+      </section>
+
+      <section className="prof-section">
+        <h2>📋 Perguntas Cadastradas ({questions.length})</h2>
+        <div className="prof-questions-list">
+          {questions.map((q) => (
+            <div key={q.id} className="prof-question-item">
+              <div className="question-content">
+                <p className="question-text">{q.question}</p>
+                <div className="question-meta">
+                  <span className="meta-badge">{q.theme}</span>
+                  <span className={`difficulty-badge ${q.difficulty.toLowerCase()}`}>{q.difficulty}</span>
+                  <span className="meta-badge">{q.semester}</span>
+                  <span className="meta-badge">Usado {q.uses}x</span>
+                </div>
+              </div>
+              <div className="question-actions">
+                <button className="action-btn edit">✏️</button>
+                <button className="action-btn delete">🗑️</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function CreateCampaign({ setPage }) {
+  const [campaign, setCampaign] = useState({
+    name: '',
+    description: '',
+    semesters: ['5º'],
+    startDate: '',
+    endDate: '',
+    rounds: 5,
+  })
+
+  const [rounds, setRounds] = useState([])
+
+  const handleGenerateMatches = () => {
+    const students = [
+      'Pedro', 'Kaio', 'Lucas', 'João', 'Ana', 'Maria',
+      'Bruno', 'Sofia', 'Diego', 'Lucia', 'Felipe', 'Isabela'
+    ]
+    
+    let generatedRounds = []
+    for (let i = 0; i < campaign.rounds; i++) {
+      let roundMatches = []
+      for (let j = 0; j < students.length; j += 2) {
+        if (j + 1 < students.length) {
+          roundMatches.push({
+            player1: students[j],
+            player2: students[j + 1],
+            status: i === 0 ? 'proxima' : 'programada'
+          })
+        }
+      }
+      generatedRounds.push(roundMatches)
+    }
+    setRounds(generatedRounds)
+  }
+
+  return (
+    <div className="professor-container">
+      <section className="professor-header">
+        <h1>🎯 Criar Campeonato</h1>
+        <p>Configure um novo campeonato para seus alunos</p>
+      </section>
+
+      <section className="prof-section">
+        <h2>Informações do Campeonato</h2>
+        <div className="prof-form">
+          <div className="form-group-full">
+            <label>Nome do Campeonato *</label>
+            <input
+              type="text"
+              placeholder="Ex: Campeonato de Mecânica 2026 S1"
+              value={campaign.name}
+              onChange={(e) => setCampaign({ ...campaign, name: e.target.value })}
+            />
+          </div>
+
+          <div className="form-group-full">
+            <label>Descrição</label>
+            <textarea
+              placeholder="Descreva o campeonato..."
+              value={campaign.description}
+              onChange={(e) => setCampaign({ ...campaign, description: e.target.value })}
+              rows="3"
+            />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Semestres Participantes *</label>
+              <div className="checkbox-group">
+                {['4º', '5º', '6º'].map(sem => (
+                  <label key={sem} className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={campaign.semesters.includes(sem)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setCampaign({ ...campaign, semesters: [...campaign.semesters, sem] })
+                        } else {
+                          setCampaign({ ...campaign, semesters: campaign.semesters.filter(s => s !== sem) })
+                        }
+                      }}
+                    />
+                    {sem} Semestre
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Data Início *</label>
+              <input
+                type="date"
+                value={campaign.startDate}
+                onChange={(e) => setCampaign({ ...campaign, startDate: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Data Fim *</label>
+              <input
+                type="date"
+                value={campaign.endDate}
+                onChange={(e) => setCampaign({ ...campaign, endDate: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Quantidade de Rodadas *</label>
+              <input
+                type="number"
+                min="1"
+                max="20"
+                value={campaign.rounds}
+                onChange={(e) => setCampaign({ ...campaign, rounds: parseInt(e.target.value) })}
+              />
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button className="btn-primary" onClick={handleGenerateMatches}>
+              🎲 Sortear Confrontos
+            </button>
+            <button className="btn-secondary">
+              ✓ Criar Campeonato
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {rounds.length > 0 && (
+        <section className="prof-section">
+          <h2>🎲 Confrontos Sorteados</h2>
+          {rounds.map((roundMatches, roundIdx) => (
+            <div key={roundIdx} className="prof-round-container">
+              <h3>Rodada {roundIdx + 1}</h3>
+              <div className="prof-matches-grid">
+                {roundMatches.map((match, idx) => (
+                  <div key={idx} className="prof-match-card">
+                    <div className="match-player">{match.player1}</div>
+                    <div className="match-vs">vs</div>
+                    <div className="match-player">{match.player2}</div>
+                    <div className={`match-status ${match.status}`}>
+                      {match.status === 'proxima' ? '⏰ Próxima' : '📅 Programada'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+    </div>
+  )
+}
+
+function CampaignHistory() {
+  const history = [
+    { id: 1, name: 'Mecânica 2025 S2', period: 'Ago-Set 2025', status: 'finalizado', winner: 'Ana Silva', rounds: 12 },
+    { id: 2, name: 'Dinâmica 2025 S1', period: 'Mai-Jun 2025', status: 'finalizado', winner: 'Pedro Santos', rounds: 10 },
+    { id: 3, name: 'Termodinâmica 2024 S2', period: 'Nov-Dez 2024', status: 'finalizado', winner: 'Marina Costa', rounds: 8 },
+  ]
+
+  return (
+    <div className="professor-container">
+      <section className="professor-header">
+        <h1>📜 Histórico de Campeonatos</h1>
+        <p>Acompanhe todos os campeonatos já realizados</p>
+      </section>
+
+      <section className="prof-section">
+        <div className="prof-history-list">
+          {history.map((camp) => (
+            <div key={camp.id} className="prof-history-item">
+              <div className="history-header">
+                <h3 className="history-name">{camp.name}</h3>
+                <span className="history-status">✓ {camp.status.toUpperCase()}</span>
+              </div>
+              <div className="history-details">
+                <div className="history-detail">
+                  <span className="detail-label">Período</span>
+                  <span className="detail-value">{camp.period}</span>
+                </div>
+                <div className="history-detail">
+                  <span className="detail-label">Vencedor</span>
+                  <span className="detail-value">🏆 {camp.winner}</span>
+                </div>
+                <div className="history-detail">
+                  <span className="detail-label">Rodadas</span>
+                  <span className="detail-value">{camp.rounds}</span>
+                </div>
+              </div>
+              <button className="history-action">Ver Resultados →</button>
+            </div>
+          ))}
         </div>
       </section>
     </div>
