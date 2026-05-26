@@ -51,8 +51,8 @@ export default function App() {
 
       <main className="content">
         {page === 'inicio' && <HomePage />}
-        {page === 'ranking' && <PlaceholderPage title="🏆 Ranking Geral" description="Veja a posição de todos os competidores." />}
-        {page === 'perfil' && <PlaceholderPage title="👤 Meu Perfil" description="Visualize seus dados, conquistas e histórico." />}
+        {page === 'ranking' && <RankingPage />}
+        {page === 'perfil' && <ProfilePage />}
       </main>
     </div>
   )
@@ -244,5 +244,455 @@ function PlaceholderPage({ title, description }) {
         <div className="placeholder-box">Página base pronta para receber conteúdo futuro</div>
       </div>
     </section>
+  )
+}
+
+/* ================================================================ */
+/* RANKING PAGE - CLASSIFICAÇÃO GERAL */
+/* ================================================================ */
+
+function RankingPage() {
+  const [filterSemester, setFilterSemester] = useState('all')
+  const [filterPeriod, setFilterPeriod] = useState('season')
+
+  const allRankings = [
+    { rank: 1, name: 'Marina Costa', semester: '5º', wins: 28, draws: 2, losses: 3, points: 2480, streak: 7, movement: 'up', movementAmount: 2 },
+    { rank: 2, name: 'Rafael Mendes', semester: '5º', wins: 26, draws: 3, losses: 4, points: 2320, streak: 5, movement: 'up', movementAmount: 1 },
+    { rank: 3, name: 'Luccas Pereira', semester: '6º', wins: 24, draws: 2, losses: 5, points: 2150, streak: 4, movement: 'stable', movementAmount: 0 },
+    { rank: 4, name: 'Ana Silva', semester: '5º', wins: 22, draws: 4, losses: 7, points: 1980, streak: 3, movement: 'down', movementAmount: 1 },
+    { rank: 5, name: 'Carlos Oliveira', semester: '7º', wins: 20, draws: 5, losses: 8, points: 1850, streak: 2, movement: 'stable', movementAmount: 0 },
+    { rank: 6, name: 'Beatriz Lima', semester: '5º', wins: 19, draws: 3, losses: 11, points: 1720, streak: 1, movement: 'down', movementAmount: 2 },
+    { rank: 7, name: 'Diego Santos', semester: '4º', wins: 18, draws: 6, losses: 9, points: 1640, streak: 6, movement: 'up', movementAmount: 3 },
+    { rank: 8, name: 'Fernanda Rocha', semester: '5º', wins: 17, draws: 4, losses: 12, points: 1520, streak: 2, movement: 'stable', movementAmount: 0 },
+    { rank: 9, name: 'Gabriel Martins', semester: '6º', wins: 16, draws: 5, losses: 14, points: 1450, streak: 3, movement: 'up', movementAmount: 1 },
+    { rank: 10, name: 'Helena Costa', semester: '5º', wins: 15, draws: 7, losses: 13, points: 1380, streak: 1, movement: 'down', movementAmount: 1 },
+    { rank: 11, name: 'Igor Souza', semester: '3º', wins: 14, draws: 4, losses: 15, points: 1310, streak: 2, movement: 'stable', movementAmount: 0 },
+    { rank: 12, name: 'Julia Ferreira', semester: '5º', wins: 13, draws: 8, losses: 14, points: 1250, streak: 4, movement: 'up', movementAmount: 2 },
+    { rank: 13, name: 'Kevin Alves', semester: '2º', wins: 12, draws: 6, losses: 17, points: 1170, streak: 1, movement: 'down', movementAmount: 1 },
+    { rank: 14, name: 'Larissa Gomes', semester: '5º', wins: 11, draws: 5, losses: 19, points: 1100, streak: 3, movement: 'up', movementAmount: 1 },
+    { rank: 15, name: 'Mateus Ribeiro', semester: '4º', wins: 10, draws: 7, losses: 18, points: 1050, streak: 2, movement: 'stable', movementAmount: 0 },
+    { rank: 16, name: 'Nadia Santos', semester: '5º', wins: 9, draws: 6, losses: 20, points: 980, streak: 1, movement: 'down', movementAmount: 2 },
+    { rank: 17, name: 'Otavio Dias', semester: '6º', wins: 8, draws: 4, losses: 23, points: 900, streak: 2, movement: 'up', movementAmount: 1 },
+    { rank: 18, name: 'Patricia Lima', semester: '5º', wins: 7, draws: 5, losses: 23, points: 830, streak: 1, movement: 'stable', movementAmount: 0 },
+    { rank: 19, name: 'Quincy Brown', semester: '3º', wins: 6, draws: 3, losses: 26, points: 750, streak: 0, movement: 'down', movementAmount: 1 },
+    { rank: 20, name: 'Ronaldo Silva', semester: '5º', wins: 5, draws: 4, losses: 26, points: 680, streak: 1, movement: 'up', movementAmount: 1 },
+  ]
+
+  const quickStats = [
+    { icon: '🔥', value: '7', label: 'Maior Sequência', player: 'Marina Costa' },
+    { icon: '⚡', value: 'Marina Costa', label: 'Aluno Mais Ativo', player: '33 confrontos' },
+    { icon: '📊', value: '96%', label: 'Melhor Taxa', player: 'Rafael Mendes' },
+    { icon: '💪', value: '33', label: 'Mais Confrontos', player: 'Marina Costa' },
+  ]
+
+  const championsTimeline = [
+    { year: 2026, champion: 'Marina Costa', semester: '5º Sem.', points: 2480, matches: 33 },
+    { year: 2025, champion: 'Pedro Mendes', semester: 'Anterior', points: 2350, matches: 31 },
+    { year: 2024, champion: 'Julia Ferreira', semester: 'Anterior', points: 2200, matches: 29 },
+  ]
+
+  const filteredRankings = filterSemester === 'all' ? allRankings : allRankings.filter(r => r.semester === filterSemester + 'º')
+
+  return (
+    <div className="ranking-container">
+      {/* RANKING HEADER */}
+      <section className="ranking-header">
+        <h1 className="ranking-header-title">🏆 Ranking Geral</h1>
+        <p className="ranking-header-subtitle">Posição de todos os competidores do campeonato universitário</p>
+        
+        <div className="ranking-info">
+          <div className="ranking-info-item">
+            <div className="ranking-info-label">Próxima Atualização</div>
+            <div className="ranking-info-value">00:00 (6h)</div>
+          </div>
+          <div className="ranking-info-item">
+            <div className="ranking-info-label">Rodada Atual</div>
+            <div className="ranking-info-value">8</div>
+          </div>
+          <div className="ranking-info-item">
+            <div className="ranking-info-label">Temporada</div>
+            <div className="ranking-info-value">2026 S1</div>
+          </div>
+          <div className="ranking-info-item">
+            <div className="ranking-info-label">Total Participantes</div>
+            <div className="ranking-info-value">145</div>
+          </div>
+        </div>
+      </section>
+
+      {/* PODIUM - TOP 3 */}
+      <section className="podium-section">
+        <h2 className="podium-title">🥇 Podium dos Melhores</h2>
+        <div className="podium">
+          {[
+            { ...allRankings[1], medal: '🥈', class: 'silver' },
+            { ...allRankings[0], medal: '🥇', class: 'gold' },
+            { ...allRankings[2], medal: '🥉', class: 'bronze' },
+          ].map((player, idx) => (
+            <div key={idx} className={`podium-item ${player.class}`}>
+              <div className="podium-medal">{player.medal}</div>
+              <div className="podium-position">#{player.rank}</div>
+              <div className="podium-name">{player.name}</div>
+              <div className="podium-semester">{player.semester}</div>
+              <div className="podium-points">
+                <div className="podium-points-label">Pontos</div>
+                <div>{player.points}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FILTERS */}
+      <section className="filter-section">
+        <h3 className="filter-title">🔍 Filtros</h3>
+        <div className="filter-controls">
+          <div className="filter-group">
+            <label className="filter-label">Semestre</label>
+            <div className="filter-select">
+              <select value={filterSemester} onChange={(e) => setFilterSemester(e.target.value)}>
+                <option value="all">Todos os Semestres</option>
+                <option value="2">2º Semestre</option>
+                <option value="3">3º Semestre</option>
+                <option value="4">4º Semestre</option>
+                <option value="5">5º Semestre</option>
+                <option value="6">6º Semestre</option>
+                <option value="7">7º Semestre</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="filter-group">
+            <label className="filter-label">Período</label>
+            <div className="filter-buttons">
+              <button 
+                className={`filter-button ${filterPeriod === '7days' ? 'active' : ''}`}
+                onClick={() => setFilterPeriod('7days')}
+              >
+                Últimos 7 dias
+              </button>
+              <button 
+                className={`filter-button ${filterPeriod === 'season' ? 'active' : ''}`}
+                onClick={() => setFilterPeriod('season')}
+              >
+                Temporada Atual
+              </button>
+              <button 
+                className={`filter-button ${filterPeriod === 'history' ? 'active' : ''}`}
+                onClick={() => setFilterPeriod('history')}
+              >
+                Histórico
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* LEADERBOARD */}
+      <section className="leaderboard-section">
+        <h2 className="leaderboard-title">📊 Ranking Completo</h2>
+        <div className="leaderboard-list">
+          {filteredRankings.map((player) => (
+            <div key={player.rank} className="leaderboard-row">
+              <div className={`rank-position-badge ${player.rank <= 3 ? 'top-3 ' + ['', 'gold', 'silver', 'bronze'][player.rank] : ''}`}>
+                {player.rank}
+              </div>
+              <div className="rank-player-info">
+                <div className="rank-player-avatar">{player.name.charAt(0)}</div>
+                <div className="rank-player-details">
+                  <div className="rank-player-name">{player.name}</div>
+                  <div className="rank-player-semester">{player.semester} semestre</div>
+                </div>
+              </div>
+              <div className="rank-record">
+                <span className="rank-record-win">{player.wins}V</span>
+                <span>•</span>
+                <span className="rank-record-draw">{player.draws}E</span>
+                <span>•</span>
+                <span className="rank-record-loss">{player.losses}D</span>
+              </div>
+              <div className="rank-points">{player.points}</div>
+              <div className="rank-streak">
+                <div className="rank-streak-count">{player.streak}</div>
+                <div className="rank-streak-label">seq.</div>
+              </div>
+              <div className="rank-movement">
+                <div className={`rank-movement-indicator rank-movement-${player.movement}`}>
+                  {player.movement === 'up' ? '↑' : player.movement === 'down' ? '↓' : '—'}
+                </div>
+                <div className="rank-movement-amount">{player.movementAmount}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* QUICK STATS */}
+      <section className="quick-stats-section">
+        <h2 className="quick-stats-title">⭐ Estatísticas Rápidas</h2>
+        <div className="quick-stats-grid">
+          {quickStats.map((stat, idx) => (
+            <div key={idx} className="quick-stat-card">
+              <div className="quick-stat-icon">{stat.icon}</div>
+              <div className="quick-stat-value">{stat.value}</div>
+              <div className="quick-stat-name">{stat.label}</div>
+              <div className="quick-stat-player">{stat.player}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CHAMPIONS TIMELINE */}
+      <section className="champions-timeline-section">
+        <h2 className="champions-timeline-title">👑 Histórico de Campeões</h2>
+        <div className="champions-timeline">
+          {championsTimeline.map((champ, idx) => (
+            <div key={idx} className="champion-timeline-item">
+              <div className="champion-timeline-year">
+                <div className="champion-timeline-year-label">{champ.year}</div>
+                <div className="champion-timeline-year-value">{champ.year === 2026 ? '🔴 Atual' : '✓'}</div>
+              </div>
+              <div className="champion-timeline-info">
+                <div className="champion-timeline-name">👑 {champ.champion}</div>
+                <div className="champion-timeline-details">
+                  <div className="champion-detail-item">
+                    <div className="champion-detail-label">Semestre</div>
+                    <div className="champion-detail-value">{champ.semester}</div>
+                  </div>
+                  <div className="champion-detail-item">
+                    <div className="champion-detail-label">Pontos</div>
+                    <div className="champion-detail-value">{champ.points}</div>
+                  </div>
+                  <div className="champion-detail-item">
+                    <div className="champion-detail-label">Confrontos</div>
+                    <div className="champion-detail-value">{champ.matches}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+/* ================================================================ */
+/* PROFILE PAGE - PERFIL DO ALUNO */
+/* ================================================================ */
+
+function ProfilePage() {
+  const profileData = {
+    name: 'João Silva',
+    course: 'Engenharia Mecânica',
+    semester: '5º',
+    avatar: 'J',
+    ranking: 23,
+    points: 1850,
+    level: 12,
+    levelXp: 2850,
+    levelXpMax: 3000,
+    status: 'Em Ascensão',
+  }
+
+  const stats = [
+    { icon: '🎯', value: '24', label: 'Vitórias', detail: '56% aproveitamento' },
+    { icon: '🤝', value: '8', label: 'Empates', detail: '18% dos confrontos' },
+    { icon: '❌', value: '11', label: 'Derrotas', detail: '26% dos confrontos' },
+    { icon: '📊', value: '84%', label: 'Acertos', detail: 'Em respostas' },
+    { icon: '⚡', value: '43', label: 'Disputas', detail: 'Total realizadas' },
+    { icon: '🔥', value: '7', label: 'Sequência', detail: 'Vitórias em sequência' },
+  ]
+
+  const achievements = [
+    { id: 1, icon: '🥇', name: 'Primeiro Lugar', unlocked: false },
+    { id: 2, icon: '🔟', name: '10 Vitórias', unlocked: true },
+    { id: 3, icon: '💯', name: '100 Respostas', unlocked: true },
+    { id: 4, icon: '🏆', name: 'Top Semestre', unlocked: false },
+    { id: 5, icon: '👑', name: 'Campeão', unlocked: false },
+    { id: 6, icon: '⚡', name: '100% Semana', unlocked: true },
+  ]
+
+  const recentMatches = [
+    { id: 1, result: 'win', opponent: 'Marina Costa', points: 3, date: 'há 2 horas' },
+    { id: 2, result: 'win', opponent: 'Rafael Mendes', points: 3, date: 'ontem' },
+    { id: 3, result: 'draw', opponent: 'Ana Silva', points: 1, date: 'ontem' },
+    { id: 4, result: 'loss', opponent: 'Carlos Oliveira', points: 0, date: '2 dias' },
+    { id: 5, result: 'win', opponent: 'Luccas Pereira', points: 3, date: '2 dias' },
+  ]
+
+  return (
+    <div className="profile-container">
+      {/* PROFILE HEADER */}
+      <section className="profile-header">
+        <div className="profile-hero">
+          <div className="profile-avatar-large">{profileData.avatar}</div>
+          
+          <div className="profile-info">
+            <h1 className="profile-name">{profileData.name}</h1>
+            <p className="profile-course">{profileData.semester}º semestre • {profileData.course}</p>
+            <div className="profile-status-badge">✨ {profileData.status}</div>
+          </div>
+
+          <div className="profile-rank-badge">
+            <div className="rank-badge-number">#{profileData.ranking}</div>
+            <div className="rank-badge-label">Posição</div>
+          </div>
+        </div>
+
+        {/* STATS HEADER */}
+        <div className="profile-stats-header">
+          <div className="stat-header-item">
+            <div className="stat-header-label">Pontos Totais</div>
+            <div className="stat-header-value">{profileData.points}</div>
+          </div>
+          <div className="stat-header-item">
+            <div className="stat-header-label">Nível</div>
+            <div className="stat-header-value">{profileData.level}</div>
+          </div>
+          <div className="stat-header-item">
+            <div className="stat-header-label">Ranking Global</div>
+            <div className="stat-header-value">#{profileData.ranking}</div>
+          </div>
+        </div>
+
+        {/* PROGRESS BARS */}
+        <div className="profile-progress">
+          <div className="progress-section">
+            <div className="progress-header">
+              <span className="progress-title">Progresso do Nível</span>
+              <span className="progress-value">{profileData.levelXp} / {profileData.levelXpMax}</span>
+            </div>
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: `${(profileData.levelXp / profileData.levelXpMax) * 100}%` }}></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* STATS GRID */}
+      <section className="section">
+        <div className="section-header">
+          <h2>📈 Estatísticas de Desempenho</h2>
+        </div>
+        <div className="profile-stats">
+          {stats.map((stat) => (
+            <div key={stat.label} className="profile-stat-card">
+              <div className="stat-card-icon">{stat.icon}</div>
+              <div className="stat-card-value">{stat.value}</div>
+              <div className="stat-card-label">{stat.label}</div>
+              <div className="stat-card-detail">{stat.detail}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ACHIEVEMENTS */}
+      <section className="section">
+        <div className="section-header">
+          <h2>🏅 Conquistas Desbloqueadas</h2>
+          <span className="section-subtitle">3 de 6 desbloqueadas</span>
+        </div>
+        <div className="achievements-grid">
+          {achievements.map((achievement) => (
+            <div 
+              key={achievement.id} 
+              className={`achievement-badge ${achievement.unlocked ? 'unlocked' : 'locked'}`}
+              title={achievement.unlocked ? `Desbloqueado: ${achievement.name}` : `Bloqueado: ${achievement.name}`}
+            >
+              <div className="achievement-icon">{achievement.icon}</div>
+              <div className="achievement-name">{achievement.name}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* RECENT MATCHES */}
+      <section className="section">
+        <div className="section-header">
+          <h2>⚡ Histórico Recente</h2>
+          <span className="section-subtitle">Últimas 5 disputas</span>
+        </div>
+        <div className="recent-matches-list">
+          {recentMatches.map((match) => (
+            <div key={match.id} className="recent-match-item">
+              <div className={`match-result-badge ${match.result}`}>
+                {match.result === 'win' ? '✓' : match.result === 'draw' ? '=' : '✕'}
+              </div>
+              <div className="match-info">
+                <div className="match-players">
+                  {match.result === 'win' ? '🎯 Vitória' : match.result === 'draw' ? '🤝 Empate' : '❌ Derrota'} • {match.opponent}
+                </div>
+                <div className="match-date">{match.date}</div>
+              </div>
+              <div className="match-points">+{match.points} pts</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* COMPARISON */}
+      <section className="section">
+        <div className="comparison-section">
+          <div className="section-header">
+            <h2>📊 Comparação com a Turma</h2>
+          </div>
+          
+          <div className="comparison-content">
+            <div className="comparison-item">
+              <div className="comparison-label">Taxa de Aprovação</div>
+              <div className="comparison-bars">
+                <div className="comparison-bar">
+                  <div className="comparison-bar-label">
+                    <span className="comparison-bar-name">Seu desempenho</span>
+                    <span className="comparison-bar-value">84%</span>
+                  </div>
+                  <div className="comparison-bar-track">
+                    <div className="comparison-bar-fill" style={{ width: '84%' }}></div>
+                  </div>
+                </div>
+                <div className="comparison-bar">
+                  <div className="comparison-bar-label">
+                    <span className="comparison-bar-name">Média da turma</span>
+                    <span className="comparison-bar-value">68%</span>
+                  </div>
+                  <div className="comparison-bar-track">
+                    <div className="comparison-bar-fill" style={{ width: '68%' }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="comparison-item">
+              <div className="comparison-label">Pontos por Disputa</div>
+              <div className="comparison-bars">
+                <div className="comparison-bar">
+                  <div className="comparison-bar-label">
+                    <span className="comparison-bar-name">Sua média</span>
+                    <span className="comparison-bar-value">2.3 pts</span>
+                  </div>
+                  <div className="comparison-bar-track">
+                    <div className="comparison-bar-fill" style={{ width: '85%' }}></div>
+                  </div>
+                </div>
+                <div className="comparison-bar">
+                  <div className="comparison-bar-label">
+                    <span className="comparison-bar-name">Média da turma</span>
+                    <span className="comparison-bar-value">1.8 pts</span>
+                  </div>
+                  <div className="comparison-bar-track">
+                    <div className="comparison-bar-fill" style={{ width: '65%' }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="comparison-insight above">
+            <span>✨ Você está acima da média em ambas as métricas!</span>
+          </div>
+        </div>
+      </section>
+    </div>
   )
 }
