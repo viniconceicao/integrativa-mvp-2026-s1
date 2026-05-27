@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import MatchPage from './components/MatchPage'
 
 const studentNav = [
   { id: 'inicio', label: 'Início', icon: '🏠' },
@@ -90,7 +91,8 @@ export default function App() {
 
       <main className="content">
         {/* STUDENT PAGES */}
-        {userRole === 'student' && page === 'inicio' && <HomePage />}
+        {userRole === 'student' && page === 'inicio' && <HomePage setPage={setPage} />}
+        {userRole === 'student' && page === 'partida' && <MatchPage setPage={setPage} />}
         {userRole === 'student' && page === 'ranking' && <RankingPage />}
         {userRole === 'student' && page === 'perfil' && <ProfilePage />}
 
@@ -108,7 +110,7 @@ export default function App() {
 /* HOME PAGE - CAMPEONATO UNIVERSITÁRIO */
 /* ================================================================ */
 
-function HomePage() {
+function HomePage({ setPage }) {
   const topPlayers = [
     { rank: 1, name: 'Marina Costa', course: 'Engenharia Mecânica', points: 2480, wins: 28 },
     { rank: 2, name: 'Rafael Mendes', course: 'Engenharia Mecânica', points: 2320, wins: 26 },
@@ -152,7 +154,7 @@ function HomePage() {
           <h1>Domine o Conhecimento, Vença a Competição</h1>
           <p>Desafie seus colegas em disputas de conhecimento. Acumule pontos, suba no ranking e conquiste o título de campeão da Engenharia Mecânica.</p>
           <div className="hero-cta">
-            <button className="btn-primary">⚡ Iniciar Disputa</button>
+            <button className="btn-primary" onClick={() => setPage('partida')}>⚡ Iniciar Disputa</button>
             <button className="btn-secondary">📖 Ver Regras</button>
           </div>
         </div>
